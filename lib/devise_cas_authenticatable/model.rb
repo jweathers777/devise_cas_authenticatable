@@ -36,6 +36,16 @@ module Devise
             resource
           end
         end
+
+        # Expose the private methods used by rubycas-client for reading/writing/deleting
+        # files that store the link between CAS tickets and Rails sessions
+        ::CASClient::Frameworks::Rails::Filter.private_methods.each do |m|
+          if m =~ /_lookup/
+            define_method(m) do |*args|
+              ::CASClient::Frameworks::Rails::Filter.send(m,*args)
+            end
+          end
+        end
       end
     end
   end

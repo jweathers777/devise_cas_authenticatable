@@ -14,9 +14,13 @@ module Devise
       # fail (if we're just returning from the CAS server, based on the referrer)
       # or attempt to redirect to the CAS server's login URL.
       def authenticate!
+        last_ticket = session[:cas_last_valid_ticket]
         ticket = read_ticket(params)
+
         if ticket
           if resource = mapping.to.authenticate_with_cas_ticket(ticket)
+            session[:cas_devise_resouce_name] = mapping.class_name
+            session[:cas_last_valid_ticket] = ticket
             success!(resource)
           else
             fail(:invalid)
